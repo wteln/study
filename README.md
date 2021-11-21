@@ -8,7 +8,8 @@
 
 ### 安装和配置
 ```shell
-git clone git@github.com:wteln/study.git
+git clone git@github.com:wteln/study.git ## for ssh, 必须先在github上配置ssh-key
+git clone https://github.com/wteln/study.git ## for http，push时需要输入用户名和密码
 ```
 下载项目后, 需先修改一些配置文件。
 ##### 配置hadoop环境
@@ -36,6 +37,7 @@ spark:
   master: 'spark://DESKTOP-UR1BCC0.localdomain:7077' # 修改为spark master url，可以在SPARK webui上找到
   task-jar: '/mnt/d/projects/SparkWorks/w2/build/libs/tasks-all.jar' # 修改为{project_root}/build/libs/tasks-all.jar，project_root是项目根目录
   result-base: '/movie-manage/results/'
+init.path: '/mnt/c/Users/Administrator/Desktop/ml-latest/' # 修改为本地数据集位置
 ```
 
 ### 编译运行
@@ -52,3 +54,8 @@ npm run serve -- --port 3000
 ```shell
 java -jar build/libs/server.jar
 ```
+初始化初始admin用户
+```shell
+wget http://localhost:5000/movie-manager/init/movie?type=user
+```
+输出有success字样表示成功。初始用户为admin,密码admin123

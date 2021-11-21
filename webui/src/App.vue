@@ -23,12 +23,8 @@
               <el-col :span="5" :offset="8">{{ loginNotice }}</el-col>
             </el-row>
             <el-row>
-              <el-col :span="2" :offset="8">
+              <el-col :span="3" :offset="8">
                 <el-button type="primary" @click="login">登录</el-button>
-                &nbsp;&nbsp;
-                <el-button type="primary" @click="userDialogShow = true"
-                  >注册</el-button
-                >
               </el-col>
             </el-row>
           </el-form>
