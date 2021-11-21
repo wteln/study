@@ -4,8 +4,6 @@ import bigdata.movie.common.entity.{Movie, Rate, Tag}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.rdd.RDD.rddToPairRDDFunctions
 
-import scala.collection.mutable.ArrayBuffer
-
 object Filter extends SparkApplication {
   private val movieFile = "/ml-latest/movies.csv"
   private val rateFile = "/ml-latest/ratings.csv"
