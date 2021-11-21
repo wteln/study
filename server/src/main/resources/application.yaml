@@ -1,0 +1,36 @@
+spring:
+  application:
+    name: batch-scheduler-service
+
+server:
+  port: 5000
+  servlet:
+    context-path: /movie-manager
+
+spring.datasource:
+  type: com.zaxxer.hikari.HikariDataSource
+  driver-class-name: com.mysql.cj.jdbc.Driver
+  url: jdbc:mysql://localhost:3306/movie
+  username: mhy
+  password: localhost
+  # 连接池
+  hikari:
+    #连接池名
+    pool-name: DateHikariCP
+    #最小空闲连接数
+    minimum-idle: 5
+    # 空闲连接存活最大时间，默认600000（10分钟）
+    idle-timeout: 180000
+    # 连接池最大连接数，默认是10
+    maximum-pool-size: 10
+    # 此属性控制池中连接的最长生命周期，值0表示无限生命周期，默认1800000即30分钟
+    max-lifetime: 1800000
+    # 数据库连接超时时间,默认30秒，即30000
+    connection-timeout: 30000
+    connection-test-query: SELECT 1
+
+spark:
+  home: '/home/mhy/software/environment/spark-2.4.8-bin-hadoop2.7'
+  master: 'spark://DESKTOP-UR1BCC0.localdomain:7077'
+  task-jar: '/mnt/d/projects/SparkWorks/w2/build/libs/tasks-all.jar'
+  result-base: '/movie-manage/results/'
