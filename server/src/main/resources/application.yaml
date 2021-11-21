@@ -32,5 +32,7 @@ spring.datasource:
 spark:
   home: '/home/mhy/software/environment/spark-2.4.8-bin-hadoop2.7'
   master: 'spark://DESKTOP-UR1BCC0.localdomain:7077'
-  task-jar: '/mnt/d/projects/SparkWorks/w2/build/libs/tasks-all.jar'
+  task-jar: '/mnt/d/projects/SparkWorks/build/libs/tasks-all.jar'
   result-base: '/movie-manage/results/'
+
+init.path: '/mnt/c/Users/Administrator/Desktop/ml-latest/'

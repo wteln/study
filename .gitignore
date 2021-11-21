@@ -2,4 +2,4 @@
 .gradle
 docs
 webui/node_modules/
-*/build/
+build/

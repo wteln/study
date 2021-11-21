@@ -48,3 +48,7 @@ spark:
 cd webui
 npm run serve -- --port 3000
 ```
+启动server
+```shell
+java -jar build/libs/server.jar
+```

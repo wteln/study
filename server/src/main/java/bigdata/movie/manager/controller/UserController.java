@@ -11,7 +11,6 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
@@ -38,11 +37,6 @@ public class UserController {
     }
     if (user.getPassword().equals(pwd)) {
       //登录成功
-      Cookie cookie = new Cookie("isAdmin", user.isAdmin() + "");
-      cookie.setSecure(true);
-      cookie.setHttpOnly(false);
-      response.addCookie(cookie);
-      response.addCookie(new Cookie("name", user.getUsername()));
       return ResponseEntity.success(user);
     } else {
       return ResponseEntity.fail(Util.INCORRECT_PASSWORD, "incorrect password");
@@ -58,28 +52,24 @@ public class UserController {
 
   @PutMapping("/users")
   public ResponseEntity<User> updateUser(@RequestBody User user) throws AppException {
-    String name = Util.currentUser();
-    if (!name.equals(user.getUsername())) {
-      throw new AppException(Util.UNKNOWN_USER, "no privilege");
-    }
     userService.updateById(user);
     return ResponseEntity.success(user);
   }
 
+  @SuppressWarnings("unchecked")
   @GetMapping("/users")
   public ResponseEntity<Page<User>> listUser(@RequestParam(value = "pageNo", defaultValue = "1") int pageNo,
-                                                   @RequestParam(value = "pageSize", defaultValue = "50") int pageSize,
-                                                   @RequestParam(value = "userId") long uid)
+                                             @RequestParam(value = "pageSize", defaultValue = "50") int pageSize)
       throws AppException {
-    User user = userService.getById(uid);
     int count = userService.count(new QueryWrapper<User>().lambda()
-        .eq(user.isAdmin(), User::getId, uid)
-        .ne(User::isDel, true));
+        .ne(User::isDel, true)
+        .orderByDesc(User::getUsername)
+    );
     List<User> users = userService.list(new QueryWrapper<User>().lambda()
-            .eq(user.isAdmin(), User::getId, uid)
-            .ne(User::isDel, true)
-            .last(String.format("limit %d, %d", (pageNo - 1) * pageSize, pageSize))
-        );
+        .ne(User::isDel, true)
+        .orderByDesc(User::getUsername)
+        .last(String.format("limit %d, %d", (pageNo - 1) * pageSize, pageSize))
+    );
     Page<User> page = new Page<>();
     page.setTotal(count);
     page.setItems(users);
@@ -87,4 +77,13 @@ public class UserController {
     page.setPageSize(pageSize);
     return ResponseEntity.success(page);
   }
+
+  @DeleteMapping("/users/{id}")
+  public ResponseEntity<Object> deleteUser(@PathVariable("id") long id)
+      throws AppException {
+    userService.removeById(id);
+    return ResponseEntity.success(null);
+  }
+
+
 }

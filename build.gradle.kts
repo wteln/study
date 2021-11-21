@@ -31,5 +31,5 @@ tasks.create("product", type = Copy::class) {
     from("server/build/libs/")
     from("tasks/build/libs/")
     into("build/libs/")
-}.dependsOn(":w2:server:bootJar")
-    .dependsOn(":w2:tasks:shadowJar")
+}.dependsOn(":server:bootJar")
+    .dependsOn(":tasks:shadowJar")
