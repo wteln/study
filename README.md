@@ -8,7 +8,7 @@
 
 ### 安装和配置
 ```shell
-git clone 
+git clone git@github.com:wteln/study.git
 ```
 下载项目后, 需先修改一些配置文件。
 ##### 配置hadoop环境
