@@ -3,6 +3,10 @@
 set -x
 set -e
 
+jps -l|grep "org.apache.spark.deploy"|awk '{print $1}'|xargs kill
+jps -l|grep "org.apache.hadoop.hdfs.server"|awk '{print $1}'|xargs kill
+jps -l|grep "server.jar"|awk '{print $1}'|xargs kill
+
 BaseDir=$(cd `dirname $0`;pwd)
 InstallDir=$BaseDir/install
 SourceDir=$InstallDir/sources
@@ -71,20 +75,21 @@ fi
 
 cd $DistDir
 export NODE_HOME=$DistDir/$node_name
-echo export PATH=$DistDir/$node_name/bin:$PATH >> $ENV_FILE
+echo export PATH="$DistDir/$node_name/bin:\$PATH" >> $ENV_FILE
 if [ ! -d $NODE_HOME ];then
   tar -xf $SourceDir/$node_name.tar.xz
 fi
 
 ### 初始化mysql
-mysql_user="root"
-mysql_password="3306"
-mysql_db="movie_analyse"
+mysql_user="mhy"
+mysql_password="localhost"
+mysql_db="movie_filter"
 mysql -u$mysql_user -p$mysql_password -e "create database if not exists $mysql_db"
 mysql -u$mysql_user -p$mysql_password -D$mysql_db -e "source $BaseDir/server/src/main/resources/init.sql"
 
-echo export MYSQL_USER="${MYSQL_USER}" >> $ENV_FILE
-echo export MYSQL_PASSWORD="${MYSQL_PASSWORD}" >> $ENV_FILE
+echo export MYSQL_USER="${mysql_user}" >> $ENV_FILE
+echo export MYSQL_PASSWORD="${mysql_password}" >> $ENV_FILE
+echo export MYSQL_DB="${mysql_db}" >> $ENV_FILE
 
 $HADOOP_HOME/bin/hdfs dfs -put $BaseDir/ml-latest /
 cp $HADOOP_HOME/etc/hadoop/core-site.xml $PROJECT_HOME/tasks/src/main/resources/
