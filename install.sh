@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
 
 set -x
-set -e
 
 jps -l|grep "org.apache.spark.deploy"|awk '{print $1}'|xargs kill
 jps -l|grep "org.apache.hadoop.hdfs.server"|awk '{print $1}'|xargs kill
 jps -l|grep "server.jar"|awk '{print $1}'|xargs kill
+
+set -e
 
 BaseDir=$(cd `dirname $0`;pwd)
 InstallDir=$BaseDir/install
