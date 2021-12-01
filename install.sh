@@ -84,8 +84,8 @@ if [ ! -d $NODE_HOME ];then
 fi
 
 ### 初始化mysql
-mysql_user="mhy"
-mysql_password="localhost"
+mysql_user="${MYSQL_USER}"
+mysql_password="${MYSQL_PASSWORD}"
 mysql_db="movie_filter"
 mysql -u$mysql_user -p$mysql_password -e "create database if not exists $mysql_db"
 mysql -u$mysql_user -p$mysql_password -D$mysql_db -e "source $BaseDir/server/src/main/resources/init.sql"
