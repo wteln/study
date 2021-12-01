@@ -14,6 +14,8 @@ SourceDir=$InstallDir/sources
 DistDir=$InstallDir/dist
 ConfDir=$BaseDir/conf
 
+rm -rf $DistDir/*
+
 ENV_FILE="${BaseDir}/env.sh"
 echo "#!/usr/bin/env bash" > $ENV_FILE
 echo "" >> $ENV_FILE
