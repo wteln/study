@@ -90,6 +90,9 @@ mysql_db="movie_filter"
 mysql -u$mysql_user -p$mysql_password -e "create database if not exists $mysql_db"
 mysql -u$mysql_user -p$mysql_password -D$mysql_db -e "source $BaseDir/server/src/main/resources/init.sql"
 
+export MYSQL_USER="${mysql_user}"
+export MYSQL_PASSWORD="${mysql_password}"
+export MYSQL_DB="${mysql_db}"
 echo export MYSQL_USER="${mysql_user}" >> $ENV_FILE
 echo export MYSQL_PASSWORD="${mysql_password}" >> $ENV_FILE
 echo export MYSQL_DB="${mysql_db}" >> $ENV_FILE
