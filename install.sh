@@ -110,7 +110,7 @@ cd $PROJECT_HOME
 
 nohup java -jar $PROJECT_HOME/build/libs/server.jar > server.log 2>&1 &
 
-curl http://localhost:5000/movie-manager/init/movie?type=user
+wget http://localhost:5000/movie-manager/init/movie?type=user
 
 cd $PROJECT_HOME/webui
 npm install
