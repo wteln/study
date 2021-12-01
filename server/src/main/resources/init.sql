@@ -1,4 +1,4 @@
-drop table `user`;
+drop table if exists `user`;
 
 create table if not exists `user` (
     id bigint auto_increment primary key comment 'id',
