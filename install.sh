@@ -102,7 +102,8 @@ cp $HADOOP_HOME/etc/hadoop/hdfs-site.xml $PROJECT_HOME/server/src/main/resources
 envsubst < $ConfDir/application.yaml > $PROJECT_HOME/server/src/main/resources/application.yaml
 
 chmod +x $PROJECT_HOME/gradlew
-$PROJECT_HOME/gradlew product
+cd $PROJECT_HOME
+./gradlew product
 
 nohup java -jar $PROJECT_HOME/build/libs/server.jar > server.log 2>&1 &
 
