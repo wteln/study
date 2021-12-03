@@ -43,7 +43,7 @@
         >
           <el-menu-item
             style="font-size: 1.5em"
-            index="index + ''"
+            :index="index+''"
             :key="index"
             v-for="(item, index) in menuItems"
             >{{ item.title }}</el-menu-item
@@ -236,7 +236,7 @@ export default {
       },
       timer: null,
       user: {
-        login: true,
+        login: false,
         name: null,
         password: null,
       },
