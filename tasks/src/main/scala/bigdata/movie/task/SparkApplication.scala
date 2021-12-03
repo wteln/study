@@ -8,7 +8,7 @@ class SparkApplication {
     .getOrCreate()
   protected lazy val spark: SparkSession = SparkSession
     .builder()
-    .appName("Spark SQL basic example")
+    .appName("Spark Filter")
     .config("spark.some.config.option", "some-value")
     .getOrCreate()
 }

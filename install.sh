@@ -108,6 +108,8 @@ chmod +x $PROJECT_HOME/gradlew
 cd $PROJECT_HOME
 ./gradlew product
 
+$SPARK_HOME/bin/spark-submit --class bigdata.movie.task.Classifier --master $SPARK_MASTER $PROJECT_HOME/build/libs/tasks-all.jar
+
 nohup java -jar $PROJECT_HOME/build/libs/server.jar > server.log 2>&1 &
 
 sleep 10

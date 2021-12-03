@@ -43,11 +43,17 @@
         >
           <el-menu-item
             style="font-size: 1.5em"
-            :index="index"
+            index="index + ''"
             :key="index"
             v-for="(item, index) in menuItems"
             >{{ item.title }}</el-menu-item
           >
+          <el-sub-menu index="2" id="submenu">
+            <template style="font-size: 1.5em" #title>统计</template>
+            <el-menu-item style="font-size: 1.5em" index="2-1">评分</el-menu-item>
+            <el-menu-item style="font-size: 1.5em" index="2-2">类别</el-menu-item>
+            <el-menu-item style="font-size: 1.5em" index="2-3">标签</el-menu-item>
+          </el-sub-menu>
         </el-menu>
       </el-header>
       <el-main>
@@ -129,6 +135,10 @@
             ></el-pagination>
           </div>
         </div>
+        <div v-if="activeIndex.startsWith('2-')">
+          <div id="chart" :style="{height: chartHeight + 'px', width: '100%'}">
+          </div>
+        </div>
         <el-dialog
           v-model="userDialogShow"
           :title="dialogType"
@@ -195,6 +205,7 @@
 <script>
 import axios from "axios";
 import { ElNotification } from "element-plus";
+import * as echarts from 'echarts';
 
 axios.defaults.withCredentials = true;
 const baseUrl = "http://localhost:5000/movie-manager/";
@@ -203,7 +214,7 @@ export default {
   name: "App",
   data() {
     return {
-      activeIndex: 0,
+      activeIndex: "0",
       menuItems: [{ title: "电影" }, { title: "用户" }],
       query: {
         begin: false,
@@ -225,7 +236,7 @@ export default {
       },
       timer: null,
       user: {
-        login: false,
+        login: true,
         name: null,
         password: null,
       },
@@ -312,6 +323,7 @@ export default {
       },
       selectedUser: null,
       editUserNotic: "",
+      chartHeight: 500
     };
   },
   created: function () {
@@ -319,10 +331,12 @@ export default {
   },
   methods: {
     handleSelect(index) {
-      console.log(index);
-      this.activeIndex = index;
-      if (this.activeIndex == 1) {
-        this.listUsers();
+      console.log(index)
+      this.activeIndex = index
+      if (this.activeIndex == "1") {
+        this.listUsers()
+      } else if (this.activeIndex.startsWith("2-")) {
+        this.showCharts()
       }
     },
     beginQuery() {
@@ -581,6 +595,68 @@ export default {
     dialogClose() {
       this.userDialogShow = false;
     },
+    showCharts() {
+      var chartType = "bar"
+      var type = "tag"
+      var vertical = true
+      var log = false
+      if(this.activeIndex == "2-1") {
+        chartType = "line"
+        type = "rate"
+        vertical = false
+      } else if(this.activeIndex == "2-2") {
+        chartType = "bar"
+        type = "genre"
+        log = true
+      } 
+      const url = baseUrl + "/charts?type=" + type
+      const func = this.drawChart
+      axios.get(url).then(res => {
+        if(!this.showErrors(res)) {
+          const numLabels = res.data['obj']['xs'].length
+          this.chartHeight = numLabels * 20 + numLabels * 20
+          console.log(numLabels, this.chartHeight)
+          if(this.chartHeight > 10000) {
+            this.chartHeight = 10000
+          }
+          window.setTimeout(()=>{
+            func(chartType, vertical, log, res.data['obj']['xs'], res.data['obj']['ys'])
+          }, 1000)
+        }
+      })
+
+    },
+    drawChart(type, vertical, log, xs, ys) {
+      const chartDom = document.getElementById('chart');
+      const myChart = echarts.init(chartDom);      
+      
+      const option = {}
+      const xAxis= {
+        type: 'category',
+        data: xs
+      }
+      const yAxis= {
+        type: 'value'
+      }
+      const series= [
+        {
+          data: ys,
+          type: type
+        }
+      ]
+
+      if(log) {
+        yAxis.type = "log"
+      }
+
+      option.xAxis = vertical ? yAxis : xAxis
+      option.yAxis = vertical ? xAxis : yAxis
+
+      option.series = series
+
+      console.log(option)
+      myChart.setOption(option)
+    },
     showErrors(res) {
       if (res.status != 200) {
         this.showError(res.statusText);
@@ -614,5 +690,9 @@ export default {
 
 .menu-item {
   font-size: 20em;
+}
+
+#submenu>div {
+  font-size: 1.5em;
 }
 </style>

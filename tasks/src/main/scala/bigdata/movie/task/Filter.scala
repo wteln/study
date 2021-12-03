@@ -1,66 +1,17 @@
 package bigdata.movie.task
 
-import bigdata.movie.common.entity.{Movie, Rate, Tag}
+import bigdata.movie.common.entity.Movie
 import org.apache.spark.rdd.RDD
 import org.apache.spark.rdd.RDD.rddToPairRDDFunctions
 
 object Filter extends SparkApplication {
-  private val movieFile = "/ml-latest/movies.csv"
-  private val rateFile = "/ml-latest/ratings.csv"
-  private val tagFile = "/ml-latest/tags.csv"
 
   def main(args: Array[String]): Unit = {
     val opt = parseArgument(args)
-    val movieRdd = sc.textFile(movieFile)
-      .flatMap(row => {
-        val sps = row.split(",")
-        if(sps(0).equals("movieId")) {
-          Iterator.empty
-        } else {
-          val movie = new Movie
-          movie.setId(sps(0).toLong)
-          movie.setTitle(sps(1))
-          movie.setGenres(sps(2))
-          Iterator(movie)
-        }
-      })
-    val rateRdd: RDD[(Long, Double)] = sc.textFile(rateFile)
-        .flatMap(row => {
-          val sps = row.split(",")
-          if(sps(0).equals("userId")) {
-            Iterator.empty
-          } else {
-            val rate = new Rate
-            rate.setUserId(sps(0).toLong)
-            rate.setMovieId(sps(1).toLong)
-            rate.setRate(sps(2).toDouble)
-            rate.setTs(sps(3).toLong)
-            Iterator(rate)
-          }
-        }).map(r=>(r.getMovieId, (r.getRate, 1)))
-      .reduceByKey{case (r1, r2)=>(r1._1 + r2._1, r1._2+r2._2)}
-      .map{case (mid, (sum, cnt)) => (mid, sum / cnt)}
+    val movieRdd = Source.movie
+    val rateRdd: RDD[(Long, Double)] = Source.avgRate
 
-    val tagRdd: RDD[(Long, String)] = sc.textFile(tagFile)
-      .flatMap(row=>{
-        try {
-          val sps = parseCsvWithExpect(row, 4)
-          if (sps(0).equals("userId")) {
-            Iterator.empty
-          } else {
-            val tag = new Tag
-            tag.setUserId(sps(0).toLong)
-            tag.setMovieId(sps(1).toLong)
-            tag.setTag(sps(2))
-            tag.setTs(sps(3).toLong)
-            Iterator(tag)
-          }
-        }catch {
-          case e: Exception => Iterator.empty
-        }
-      }).map(t => (t.getMovieId, Set(t.getTag)))
-      .reduceByKey((s1,s2) => s1 ++ s2)
-      .map{ case (mid, s) => (mid, s.mkString("|"))}
+    val tagRdd: RDD[(Long, String)] = Source.sumTag
 
     val filteredMovieRdd: RDD[(Long, Movie)] = if(opt.name != null || opt.category != null) {
       movieRdd.filter(movie=>{
@@ -87,7 +38,7 @@ object Filter extends SparkApplication {
       .join(filteredRateRdd)
       .join(filteredTagRdd)
       .map{ case (_, ((movie, rate), tag)) =>
-        f"${movie.getId}, ${movie.getTitle}, ${movie.getGenres}, ${rate}%.1f, ${tag})"
+        f"${movie.getId}, ${movie.getTitle}, ${movie.getGenres}, $rate%.1f, $tag)"
       }
     result.saveAsTextFile(opt.outputPath)
   }
@@ -123,14 +74,6 @@ object Filter extends SparkApplication {
       case _ =>
         throw new RuntimeException()
     }
-  }
-
-  def parseCsvWithExpect(line: String, size: Int): Array[String] = {
-    val arr = line.split(",")
-    if(arr.size != size) {
-      throw new IllegalArgumentException(line)
-    }
-    arr;
   }
 }
 

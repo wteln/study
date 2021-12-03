@@ -54,7 +54,7 @@ public class QueryServiceImpl implements QueryService {
     long qid = System.currentTimeMillis();
     StringBuilder builder = new StringBuilder();
     builder.append(String.format("%s/bin/spark-submit --class bigdata.movie.task.Filter --master %s %s " +
-            "--output %s/%d.csv --minRate %.1f --maxRate %.1f",
+            "--output %s/filter/%d.csv --minRate %.1f --maxRate %.1f",
         sparkHome, sparkMaster, taskJarPath, resultBase, qid, query.getMinRate(), query.getMaxRate()));
     if (!Strings.isNullOrEmpty(query.getName())) {
       builder.append(String.format(" --name %s", query.getName()));
@@ -108,7 +108,7 @@ public class QueryServiceImpl implements QueryService {
 
     // 再检查hdfs文件是否写成功
     try {
-      Path path = new Path(String.format("%s/%s.csv", resultBase, queryId));
+      Path path = new Path(String.format("%s/filter/%s.csv", resultBase, queryId));
       Path successPath = new Path(path, "_SUCCESS");
       logger.info("check path {}", successPath);
       if (fs.exists(path) && fs.exists(successPath)) {
@@ -129,7 +129,7 @@ public class QueryServiceImpl implements QueryService {
       throw new AppException(Util.QUERY_EXEC_ERROR, "context lost");
     }
 
-    Path path = new Path(String.format("%s/%s.csv", resultBase, queryId));
+    Path path = new Path(String.format("%s/filter/%s.csv", resultBase, queryId));
     List<Path> files = new ArrayList<>();
     try {
       RemoteIterator<LocatedFileStatus> fileStatues = fs.listFiles(path, false);
